@@ -7,14 +7,15 @@ def inc_count(prices, level):
     prices[level] = prices.get(level, 0) + 1
 
 
-def find_levels(data):
+def find_levels(data: list, threshold: int, price_sorted: bool):
     """
     Find levels
 
-    :param data:  sources.structures.ohlc.OHLCData
+    :param data:  list of OHLCData
+    :param threshold: do not return levels with kick count less than it
+    :param price_sorted: sort levels by price instead of kick count
     :return: list of prices levels sorted by count
     """
-    threshold = 5
     levels = list()
     prices = dict()
 
@@ -31,4 +32,5 @@ def find_levels(data):
 
         levels.append((price, count))
 
-    return sorted(levels, key=lambda x: x[1], reverse=True)
+    key = 0 if price_sorted else 1
+    return sorted(levels, key=lambda x: x[key], reverse=True)
