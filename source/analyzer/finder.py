@@ -3,8 +3,14 @@ Process data to find levels
 """
 
 
-def inc_count(prices, level):
-    prices[level] = prices.get(level, 0) + 1
+def inc_count(prices, level, bottom):
+    if level not in prices:
+        prices[level] = dict(b=0, t=0)
+
+    if bottom:
+        prices[level]['b'] += 1
+    else:
+        prices[level]['t'] += 1
 
 
 def find_levels(data: list, threshold: int, price_sorted: bool):
@@ -20,17 +26,27 @@ def find_levels(data: list, threshold: int, price_sorted: bool):
     prices = dict()
 
     for d in data:
-        inc_count(prices, d.open)
-        inc_count(prices, d.close)
-        inc_count(prices, d.high)
-        inc_count(prices, d.low)
+        if d.open <= d.close:
+            inc_count(prices, d.open, bottom=False)
+            inc_count(prices, d.close, bottom=True)
+        else:
+            inc_count(prices, d.open, bottom=True)
+            inc_count(prices, d.close, bottom=False)
+
+        # High hits level from bottom only
+        inc_count(prices, d.high, bottom=True)
+        # Low hits level from top only
+        inc_count(prices, d.low, bottom=False)
 
     # Linearize and remove levels < threshold count
-    for price, count in prices.items():
-        if count < threshold:
+    for price, tb in prices.items():
+        if not tb['t'] and not tb['b']:
             continue
 
-        levels.append((price, count))
+        if tb['t'] + tb['b'] < threshold:
+            continue
+
+        levels.append((price, tb['t'] + tb['b']))
 
     key = 0 if price_sorted else 1
     return sorted(levels, key=lambda x: x[key], reverse=True)

@@ -9,8 +9,14 @@ from .alphavantage import get_daily_data, get_intraday_data
 
 
 def download_daily_data(ticker: str):
-    return get_daily_data(ticker)
+    print('Start downloading daily data for {0}...'.format(ticker))
+    data = get_daily_data(ticker)
+    print('Complete!')
+    return data
 
 
 def download_intraday_data(ticker: str):
-    return get_intraday_data(ticker)
+    print('Start downloading intraday data for {0}...'.format(ticker))
+    data = get_intraday_data(ticker)
+    print('Complete!')
+    return data
