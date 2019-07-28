@@ -20,8 +20,12 @@ def load_data(arguments: ArgumentParser):
     :param arguments: program arguments
     :return: coroutines tuple that will return two lists of OHLC data, first element used in filtering
     """
-    if arguments.csv is not None:
-        return return_empty(), parse_csv(arguments.csv, positions=arguments.csv_ohlc)
+    if arguments.intraday is not None:
+        if arguments.daily is not None:
+            daily = parse_csv(arguments.arguments.daily, positions=arguments.ohlc_positions)
+        else:
+            daily = return_empty()
+        return daily, parse_csv(arguments.arguments.intraday, positions=arguments.ohlc_positions)
 
     if arguments.ticker is not None:
         return download_daily_data(arguments.ticker), download_intraday_data(arguments.ticker)
@@ -34,10 +38,7 @@ async def run_project():
 
     daily, intraday = load_data(arguments)
 
-    # Convert to tasks
-    print('Wait completion')
     daily, intraday = await asyncio.gather(daily, intraday)
-    print('Wait completion done')
 
     daily = filter_daily_bars(daily)
     data = filter_data(daily, intraday, arguments.price_fuzz)
