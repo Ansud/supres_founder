@@ -2,31 +2,42 @@
 Entry point for all operations
 """
 
+import asyncio
+
+from .analyzer import filter_daily_bars, filter_data, find_levels
+from .downloader import download_daily_data, download_intraday_data
 from .parse_arguments import ArgumentParser
 from .parser import parse_csv
-from .analyzer import find_levels, filter_daily_bars, filter_data
-from .downloader import download_intraday_data, download_daily_data
+
+
+async def return_empty():
+    return list()
 
 
 def load_data(arguments: ArgumentParser):
     """
 
     :param arguments: program arguments
-    :return: tuple with two lists of OHLC data, second element used in filtering
+    :return: coroutines tuple that will return two lists of OHLC data, first element used in filtering
     """
     if arguments.csv is not None:
-        return parse_csv(arguments.csv, positions=arguments.csv_ohlc), list()
+        return return_empty(), parse_csv(arguments.csv, positions=arguments.csv_ohlc)
 
     if arguments.ticker is not None:
-        return download_intraday_data(arguments.ticker), download_daily_data(arguments.ticker)
+        return download_daily_data(arguments.ticker), download_intraday_data(arguments.ticker)
 
-    return list(), list()
+    return return_empty(), return_empty()
 
 
-def run_project():
+async def run_project():
     arguments = ArgumentParser()
 
-    intraday, daily = load_data(arguments)
+    daily, intraday = load_data(arguments)
+
+    # Convert to tasks
+    print('Wait completion')
+    daily, intraday = await asyncio.gather(daily, intraday)
+    print('Wait completion done')
 
     daily = filter_daily_bars(daily)
     data = filter_data(daily, intraday, arguments.price_fuzz)
@@ -41,4 +52,3 @@ def run_project():
 
     for l in levels:
         print('Level price: {0}\tcount {1}'.format(l[0], l[1]))
-

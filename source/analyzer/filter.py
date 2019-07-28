@@ -32,7 +32,6 @@ def filter_data(daily: list, intraday: list, fuzz: float):
         possible.add(price - fuzz, price + fuzz)
 
     possible.normalize()
-    print(possible.intervals)
 
     out = list()
 

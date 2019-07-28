@@ -2,10 +2,12 @@
 Grab data from alphavantage
 """
 
-from datetime import datetime
-import urllib.request
-import urllib.parse
 import json
+import urllib.parse
+import urllib.request
+from datetime import datetime
+
+import aiohttp
 
 from source.structures import OHLCData
 
@@ -40,7 +42,7 @@ def get_time_series_key(time: str):
     return 'Time Series ({0})'.format(time)
 
 
-def get_data(ticker: str, function: str):
+async def get_data(ticker: str, function: str):
     parameters = dict(
         function=function,
         symbol=ticker.upper(),
@@ -53,16 +55,13 @@ def get_data(ticker: str, function: str):
 
     url = BASE_URL + '?' + urllib.parse.urlencode(parameters)
 
-    with urllib.request.urlopen(url) as f:
-        # TODO: add exception handling
-        output = f.read().decode('utf-8')
-        data = json.loads(output)
-
-    return data
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return json.loads(await response.text())
 
 
-def get_parsed_data(ticker: str, function: str):
-    raw_data = get_data(ticker, function)
+async def get_parsed_data(ticker: str, function: str):
+    raw_data = await get_data(ticker, function)
 
     """
     Extract values from JSON 
@@ -105,9 +104,9 @@ def get_parsed_data(ticker: str, function: str):
     return out
 
 
-def get_daily_data(ticker: str):
-    return get_parsed_data(ticker, FUNC_DAILY)
+async def get_daily_data(ticker: str):
+    return await get_parsed_data(ticker, FUNC_DAILY)
 
 
-def get_intraday_data(ticker: str):
-    return get_parsed_data(ticker, FUNC_INTRADAY)
+async def get_intraday_data(ticker: str):
+    return await get_parsed_data(ticker, FUNC_INTRADAY)

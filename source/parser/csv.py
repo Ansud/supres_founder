@@ -8,13 +8,13 @@ from typing import Optional
 from source.structures import OHLCData
 
 
-def parse_csv(
+async def parse_csv(
         file_name: str,
         delimiter: Optional[str] = ',',
         positions: Optional[list] = None
     ):
     """
-    Parse CSV values to list of OHLC prices
+    Parse CSV values to list of OHLC prices, syncronous.
 
     :param file_name: File to read from
     :param delimiter: CSV fields delimiter
