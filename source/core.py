@@ -20,14 +20,14 @@ def load_data(arguments: ArgumentParser):
     :param arguments: program arguments
     :return: coroutines tuple that will return two lists of OHLC data, first element used in filtering
     """
-    if arguments.intraday is not None:
+    if arguments.csv_mode:
         if arguments.daily is not None:
             daily = parse_csv(arguments.arguments.daily, positions=arguments.ohlc_positions)
         else:
             daily = return_empty()
         return daily, parse_csv(arguments.arguments.intraday, positions=arguments.ohlc_positions)
 
-    if arguments.ticker is not None:
+    if arguments.fetch_mode:
         return download_daily_data(arguments.ticker), download_intraday_data(arguments.ticker)
 
     return return_empty(), return_empty()

@@ -41,5 +41,13 @@ class ArgumentParser:
 
         return ticker
 
+    @property
+    def csv_mode(self):
+        return 'intraday' in self.arguments
+
+    @property
+    def fetch_mode(self):
+        return 'ticker' in self.arguments
+
     def __getattr__(self, item):
         return getattr(self.arguments, item)
