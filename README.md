@@ -18,7 +18,6 @@ pip install -r requirements.txt
 python3 find_levels.py fetch --ticker AMZN
 ```
 
-
 ## Badges
 
 [![Super-Linter](https://github.com/Ansud/supres_founder/actions/workflows/superlinter.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
