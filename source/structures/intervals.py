@@ -5,16 +5,20 @@ There is array of intervals, sorted by start.
 The main functionality - detect is point belongs to any of them or not.
 """
 
+from __future__ import annotations
+
 
 class Intervals:
-    def __init__(self):
+    intervals: list[tuple[float, float]]
+
+    def __init__(self) -> None:
         self.intervals = list()
 
-    def add(self, start: float, end: float):
+    def add(self, start: float, end: float) -> None:
         # Let simplify my life and call normalize manually
         self.intervals.append((start, end))
 
-    def normalize(self):
+    def normalize(self) -> None:
         # Sort intervals by first point
         self.intervals = sorted(self.intervals, key=lambda x: x[0])
 
@@ -22,7 +26,7 @@ class Intervals:
         current = next(intervals_iter)
 
         # Merge them to another list
-        out = list()
+        out: list[list[float]] = list()
         # The tuple can't be modified, thus make it list and convert later back
         out.append([current[0], current[1]])
         current_end = out[0][1]
@@ -39,10 +43,10 @@ class Intervals:
             current_end = item[1]
 
         # Convert back to tuples
-        self.intervals = [tuple(x) for x in out]
+        self.intervals = [(x[0], x[1]) for x in out]
 
-    def hit(self, point: float):
-        # Run through intevals list to find points
+    def hit(self, point: float) -> bool:
+        # Run through the list of intervals to find points
         start = 0
         end = len(self.intervals)
 
@@ -51,7 +55,7 @@ class Intervals:
             position = start + length
             current = self.intervals[position]
 
-            # Point lay in interval
+            # Point lay in the interval
             if current[0] <= point <= current[1]:
                 return True
 
@@ -64,40 +68,5 @@ class Intervals:
             elif point < current[0]:
                 end = position
 
-    def miss(self, point: float):
+    def miss(self, point: float) -> bool:
         return not self.hit(point)
-
-    # TODO: Create tests folder and move to unit tests
-    @staticmethod
-    def test_normalize():
-        values = [(0, 1), (2, 3), (4, 5), (5, 6), (10, 15), (13, 25), (100, 1000), (50, 60), (70, 80), (55, 57)]
-        expected = [(0, 1), (2, 3), (4, 6), (10, 25), (50, 60), (70, 80), (100, 1000)]
-
-        interval = Intervals()
-
-        for v in values:
-            interval.add(v[0], v[1])
-
-        interval.normalize()
-
-        assert len(expected) == len(interval.intervals)
-
-        for i in range(len(expected)):
-            assert expected[i] == interval.intervals[i]
-
-    @staticmethod
-    def test_hit():
-        test_data = [
-            (-1, False), (100000, False), (9, False), (93, False),
-            (0.001, True), (4.5, True), (999, True), (80, True), (0, True), (1000, True), (86, True), (51, True),
-        ]
-        interval = Intervals()
-
-        for v in [(0, 1), (4, 5), (6, 8), (10, 25), (50, 60), (70, 80), (85, 90), (100, 1000)]:
-            interval.add(v[0], v[1])
-
-        interval.normalize()
-
-        for item in test_data:
-            print('Test {0} -> {1}'.format(item[0], item[1]))
-            assert interval.hit(item[0]) == item[1]

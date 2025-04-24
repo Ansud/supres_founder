@@ -3,18 +3,20 @@ Entry point for all operations
 """
 
 import asyncio
+from collections.abc import Awaitable
 
 from .analyzer import filter_daily_bars, filter_data, find_levels
 from .downloader import download_daily_data, download_intraday_data
 from .parse_arguments import ArgumentParser
 from .parser import parse_csv
+from .structures import OHLCData
 
 
-async def return_empty():
+async def return_empty() -> list[OHLCData]:
     return list()
 
 
-def load_data(arguments: ArgumentParser):
+def load_data(arguments: ArgumentParser) -> tuple[Awaitable[list[OHLCData]], Awaitable[list[OHLCData]]]:
     """
 
     :param arguments: program arguments
@@ -33,23 +35,23 @@ def load_data(arguments: ArgumentParser):
     return return_empty(), return_empty()
 
 
-async def run_project():
+async def run_project() -> None:
     arguments = ArgumentParser()
 
-    daily, intraday = load_data(arguments)
+    daily_getter, intraday_getter = load_data(arguments)
 
-    daily, intraday = await asyncio.gather(daily, intraday)
+    daily, intraday = await asyncio.gather(daily_getter, intraday_getter)
 
     daily = filter_daily_bars(daily)
     data = filter_data(daily, intraday, arguments.price_fuzz)
 
     levels = find_levels(data, arguments.threshold, arguments.price_sorted)
 
-    print('We found following levels:')
+    print("We found following levels:")
 
     if not levels:
-        print('No any....')
+        print("No any....")
         return
 
-    for l in levels:
-        print('Level price: {0}\tcount {1}'.format(l[0], l[1]))
+    for level in levels:
+        print(f"Level price: {level[0]}\tcount {level[1]}")

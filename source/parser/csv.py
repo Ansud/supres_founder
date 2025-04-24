@@ -2,28 +2,27 @@
 Parse CSV file to list of OHLC tuples
 """
 
+from __future__ import annotations
+
 import csv
-from typing import Optional
+from pathlib import Path
 
 from source.structures import OHLCData
 
 
-async def parse_csv(
-        file_name: str,
-        delimiter: Optional[str] = ',',
-        positions: Optional[list] = None
-    ):
+async def parse_csv(file_name: str, positions: list[int], delimiter: str = ",") -> list[OHLCData]:
     """
     Parse CSV values to list of OHLC prices, syncronous.
 
     :param file_name: File to read from
     :param delimiter: CSV fields delimiter
     :param positions: OHLC positions in CSV lines
-    :return: list of tuple(O, H, L, C)
     """
     out = list()
 
-    with open(file_name, 'r') as file:
+    file_path = Path(file_name)
+
+    with file_path.open("r") as file:  # noqa: ASYNC230
         reader = csv.reader(file, delimiter=delimiter)
 
         possible_header = next(reader)

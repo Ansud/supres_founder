@@ -2,18 +2,20 @@
 Process data to find levels
 """
 
+from source.structures import OHLCData
 
-def inc_count(prices, level, bottom):
+
+def inc_count(prices: dict[float, dict[str, int]], level: float, bottom: bool) -> None:
     if level not in prices:
         prices[level] = dict(b=0, t=0)
 
     if bottom:
-        prices[level]['b'] += 1
+        prices[level]["b"] += 1
     else:
-        prices[level]['t'] += 1
+        prices[level]["t"] += 1
 
 
-def find_levels(data: list, threshold: int, price_sorted: bool):
+def find_levels(data: list[OHLCData], threshold: int, price_sorted: bool) -> list[tuple[float, int]]:
     """
     Find levels
 
@@ -22,8 +24,8 @@ def find_levels(data: list, threshold: int, price_sorted: bool):
     :param price_sorted: sort levels by price instead of kick count
     :return: list of prices levels sorted by count
     """
-    levels = list()
-    prices = dict()
+    levels: list[tuple[float, int]] = list()
+    prices: dict[float, dict[str, int]] = dict()
 
     for d in data:
         if d.open <= d.close:
@@ -38,15 +40,15 @@ def find_levels(data: list, threshold: int, price_sorted: bool):
         # Low hits level from top only
         inc_count(prices, d.low, bottom=False)
 
-    # Linearize and remove levels < threshold count
+    # Linearize and remove levels < threshold counts
     for price, tb in prices.items():
-        if not tb['t'] and not tb['b']:
+        if not tb["t"] and not tb["b"]:
             continue
 
-        if tb['t'] + tb['b'] < threshold:
+        if tb["t"] + tb["b"] < threshold:
             continue
 
-        levels.append((price, tb['t'] + tb['b']))
+        levels.append((price, tb["t"] + tb["b"]))
 
     key = 0 if price_sorted else 1
     return sorted(levels, key=lambda x: x[key], reverse=True)

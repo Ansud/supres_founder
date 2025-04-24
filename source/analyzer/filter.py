@@ -2,24 +2,28 @@
 Process daily and intraday data to filter out wrong levels
 """
 
+from __future__ import annotations
+
+from source.structures import OHLCData
 from source.structures.intervals import Intervals
 
 
-def filter_daily_bars(daily: list):
+def filter_daily_bars(daily: list[OHLCData]) -> list[OHLCData]:
     """
     Remove ordinary bars and leave only bars with high shadow
+    Now this function does nothing.
     """
     return daily
 
 
-def filter_data(daily: list, intraday: list, fuzz: float):
+def filter_data(daily: list[OHLCData], intraday: list[OHLCData], fuzz: float) -> list[OHLCData]:
     """
     The idea is simple: need to get all OHLC prices from daily basis and cleanup intraday
-    prices to remove all of them which are not located near daily prices with some fuzz.
+    prices to remove all of them, which are not located near daily prices with some fuzz.
 
     :param daily: daily OHLC data
     :param intraday: intraday OHLC data
-    :param fuzz: price level neighbourhood
+    :param fuzz: price level neighborhood
     :return: filtered OHLC data
     """
     if not daily:
@@ -33,7 +37,7 @@ def filter_data(daily: list, intraday: list, fuzz: float):
 
     possible.normalize()
 
-    out = list()
+    out: list[OHLCData] = list()
 
     for ohlc in intraday:
         for price in ohlc.linearize():
@@ -43,9 +47,8 @@ def filter_data(daily: list, intraday: list, fuzz: float):
             out.append(ohlc)
             break
 
-    print('Filtering complete:\n\tRemoved\t{0}\n\tRemained\t{1}\n\tOverall\t{2}'.format(
-        len(intraday) - len(out), len(out), len(intraday)
-    ))
+    print(
+        f"Filtering complete:\n\tRemoved\t{len(intraday) - len(out)}\n\tRemained\t{len(out)}\n\tOverall\t{len(intraday)}"
+    )
 
     return out
-
