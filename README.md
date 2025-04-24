@@ -27,4 +27,4 @@ python3 find_levels.py fetch --ticker AMZN
 ![GitHub top language](https://img.shields.io/github/languages/top/Ansud/supres_founder)
 [![Coverage Status](https://coveralls.io/repos/github/Ansud/supres_founder/badge.svg)](https://coveralls.io/github/Ansud/supres_founder)
 ![Static Badge](https://img.shields.io/badge/type%20checked-mypy-039dfc)
-[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
